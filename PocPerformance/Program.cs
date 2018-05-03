@@ -21,7 +21,7 @@ namespace PocPerformance
                 {
                     conn.Open();
 
-                    SqlCommand command = new SqlCommand("SELECT CustomerID FROM [SalesLT].[Customer]", conn);
+                    SqlCommand command = new SqlCommand("SELECT TOP 20000 CustomerID FROM [SalesLT].[Customer] WITH (NOLOCK) ORDER BY rowguid", conn);
 
                     //countSQLConnection++;
                     using (SqlDataReader reader = command.ExecuteReader())

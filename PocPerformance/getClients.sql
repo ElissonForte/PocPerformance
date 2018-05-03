@@ -36,7 +36,7 @@ BEGIN
         ,[SalesPerson]
         ,[EmailAddress]
         ,[Phone]
-	FROM [SalesLT].[Customer] WHERE CustomerID IN (SELECT ID FROM #tmpID)
+	FROM [SalesLT].[Customer] WITH (NOLOCK) WHERE CustomerID IN (SELECT ID FROM #tmpID)
 
 END
 GO
