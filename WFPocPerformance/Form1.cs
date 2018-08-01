@@ -124,18 +124,40 @@ namespace WFPocPerformance
 
                     }
 
-                    string strID = String.Join(",", lstID);
                     startTime = DateTime.Now;
 
-                    command = new SqlCommand("getClients", conn);
-                    command.CommandType = System.Data.CommandType.StoredProcedure;
-                    command.Parameters.Add(new SqlParameter("@strID", strID));
+                    Int32 index = 0;
+                    Int32 count = 10000;
+                    List<Task> tasks = new List<Task>();
 
-                    countSQLConnection++;
-                    using (SqlDataReader reader = command.ExecuteReader())
+                    for (int i = 0; i < lstID.Count; i+=count)
                     {
-                        dt.Load(reader);
+                        tasks.Add(Task.Factory.StartNew(() =>
+                        {
+                            if ((index + count) > lstID.Count)
+                                count = lstID.Count - index;
+
+                            List<int> lstIdBlock = lstID.GetRange(index, count);
+
+                            index += count;
+
+                            string strID = String.Join(",", lstIdBlock);
+
+                            command = new SqlCommand("getClients", conn);
+                            command.CommandType = System.Data.CommandType.StoredProcedure;
+                            command.Parameters.Add(new SqlParameter("@strID", strID));
+
+                            countSQLConnection++;
+                            using (SqlDataReader reader = command.ExecuteReader())
+                            {
+                                dt.Load(reader);
+                            }
+
+                        }));
+
                     }
+
+                    Task.WaitAll(tasks.ToArray());
 
                     dataGridView1.DataSource = dt;
 
